@@ -1,0 +1,127 @@
+### Seller7 Studio — Auth API Manual Tests
+### Compatible with VS Code REST Client extension or JetBrains HTTP Client
+
+@base = http://localhost:4000/api/v1
+@contentType = Content-Type: application/json
+
+### ── HEALTH ────────────────────────────────────────────────
+
+### Health check
+GET {{base}}/health
+
+### ── AUTH ─────────────────────────────────────────────────
+
+### 1. Signup
+# @name signup
+POST {{base}}/auth/signup
+{{contentType}}
+
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "SecurePass1"
+}
+
+### 2. Signup — duplicate (expect 409)
+POST {{base}}/auth/signup
+{{contentType}}
+
+{
+  "name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "SecurePass1"
+}
+
+### 3. Signup — validation failure (expect 422)
+POST {{base}}/auth/signup
+{{contentType}}
+
+{
+  "name": "",
+  "email": "not-an-email",
+  "password": "weak"
+}
+
+### 4. Login
+# @name login
+POST {{base}}/auth/login
+{{contentType}}
+
+{
+  "email": "jane@example.com",
+  "password": "SecurePass1"
+}
+
+### 5. Login — wrong password (expect 401 generic message)
+POST {{base}}/auth/login
+{{contentType}}
+
+{
+  "email": "jane@example.com",
+  "password": "WrongPassword9"
+}
+
+### 6. GET /me — requires Bearer token from login response
+# Replace <ACCESS_TOKEN> with the accessToken from step 4
+GET {{base}}/users/me
+Authorization: Bearer <ACCESS_TOKEN>
+
+### 7. PATCH /me — update name
+PATCH {{base}}/users/me
+{{contentType}}
+Authorization: Bearer <ACCESS_TOKEN>
+
+{
+  "name": "Jane Updated"
+}
+
+### 8. GET /me — no token (expect 401)
+GET {{base}}/users/me
+
+### 9. Refresh tokens (reads refresh cookie automatically in REST Client)
+POST {{base}}/auth/refresh
+
+### 10. Forgot password
+POST {{base}}/auth/forgot-password
+{{contentType}}
+
+{
+  "email": "jane@example.com"
+}
+
+### 11. Forgot password — non-existent email (same response, no enumeration)
+POST {{base}}/auth/forgot-password
+{{contentType}}
+
+{
+  "email": "nobody@nowhere.com"
+}
+
+### 12. Reset password
+# Grab the raw token from the console log (DEV) or email link (?token=...)
+POST {{base}}/auth/reset-password
+{{contentType}}
+
+{
+  "token": "<RAW_RESET_TOKEN_FROM_CONSOLE>",
+  "newPassword": "NewSecurePass2"
+}
+
+### 13. Reset password — expired/bad token (expect 400)
+POST {{base}}/auth/reset-password
+{{contentType}}
+
+{
+  "token": "invalid_token_value",
+  "newPassword": "NewSecurePass2"
+}
+
+### 14. Logout — requires Bearer token
+POST {{base}}/auth/logout
+Authorization: Bearer <ACCESS_TOKEN>
+
+### 15. Use old refresh token after logout (expect 401)
+POST {{base}}/auth/refresh
+
+### 16. 404 route
+GET {{base}}/nonexistent
