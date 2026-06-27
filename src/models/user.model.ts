@@ -7,6 +7,7 @@ export interface IUser {
   password: string;
   name: string;
   isEmailVerified: boolean;
+  credits: number;
   refreshTokenHash?: string;
   passwordResetTokenHash?: string;
   passwordResetExpires?: Date;
@@ -43,6 +44,11 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>(
     isEmailVerified: {
       type: Boolean,
       default: false,
+    },
+    credits: {
+      type: Number,
+      default: 0,
+      min: 0,
     },
     refreshTokenHash: {
       type: String,

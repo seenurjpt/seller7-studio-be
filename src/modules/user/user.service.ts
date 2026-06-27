@@ -13,6 +13,7 @@ function toSafeUser(user: IUserDocument): SafeUser {
     name: user.name,
     email: user.email,
     isEmailVerified: user.isEmailVerified,
+    credits: user.credits,
     createdAt: (user as unknown as { createdAt: Date }).createdAt,
     updatedAt: (user as unknown as { updatedAt: Date }).updatedAt,
   };

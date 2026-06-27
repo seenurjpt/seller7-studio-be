@@ -17,6 +17,7 @@ export interface SafeUser {
   name: string;
   email: string;
   isEmailVerified: boolean;
+  credits: number;
   createdAt: Date;
   updatedAt: Date;
 }

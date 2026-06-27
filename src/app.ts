@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
 import authRoutes from './modules/auth/auth.routes';
 import userRoutes from './modules/user/user.routes';
+import paymentRoutes from './modules/payment/payment.routes';
 import { ApiResponse } from './utils/ApiResponse';
 
 const app = express();
@@ -38,8 +39,15 @@ app.use(
 // Logging
 app.use(pinoHttp({ logger }));
 
-// Body parsing
-app.use(express.json());
+// Body parsing — stash the raw body so the Razorpay webhook can verify its
+// HMAC signature against the exact bytes Razorpay signed.
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      (req as express.Request & { rawBody?: Buffer }).rawBody = buf;
+    },
+  }),
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -51,6 +59,7 @@ app.get('/api/v1/health', (_req, res) => {
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/payments', paymentRoutes);
 
 // 404 + error handlers (must be last)
 app.use(notFound);

@@ -29,6 +29,12 @@ export const env = {
 
   RESET_TOKEN_EXPIRES_MIN: parseInt(optionalEnv('RESET_TOKEN_EXPIRES_MIN', '15'), 10),
 
+  // Razorpay — optional at boot so the server still runs without payments
+  // configured; the payment endpoints fail loudly if these are missing.
+  RAZORPAY_KEY_ID: optionalEnv('RAZORPAY_KEY_ID'),
+  RAZORPAY_KEY_SECRET: optionalEnv('RAZORPAY_KEY_SECRET'),
+  RAZORPAY_WEBHOOK_SECRET: optionalEnv('RAZORPAY_WEBHOOK_SECRET'),
+
   SMTP_HOST: optionalEnv('SMTP_HOST'),
   SMTP_PORT: parseInt(optionalEnv('SMTP_PORT', '587'), 10),
   SMTP_USER: optionalEnv('SMTP_USER'),
