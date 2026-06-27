@@ -3,7 +3,6 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import pinoHttp from 'pino-http';
-import { env } from './config/env';
 import { logger } from './lib/logger';
 import { errorHandler } from './middleware/errorHandler';
 import { notFound } from './middleware/notFound';
@@ -15,9 +14,23 @@ const app = express();
 
 // Security
 app.use(helmet());
+
+// Allowed browser origins. The wildcard '*' cannot be used together with
+// credentials, so we reflect the request origin when it is in this allowlist.
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://seller7-studio.vercel.app',
+];
+
 app.use(
   cors({
-    origin: '*',
+    origin(origin, callback) {
+      // Allow non-browser clients (curl, server-to-server) with no Origin header.
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Not allowed by CORS: ${origin}`));
+    },
     credentials: true,
   }),
 );
