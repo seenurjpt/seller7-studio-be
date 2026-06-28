@@ -60,3 +60,12 @@ export async function resetPassword(req: Request, res: Response) {
   await authService.resetPassword(token, newPassword);
   res.json(ApiResponse.ok('Password reset successfully. Please log in with your new password.'));
 }
+
+export async function changePassword(req: Request, res: Response) {
+  const { currentPassword, newPassword } = req.body as {
+    currentPassword: string;
+    newPassword: string;
+  };
+  await authService.changePassword(String(req.user!._id), currentPassword, newPassword);
+  res.json(ApiResponse.ok('Password changed successfully'));
+}

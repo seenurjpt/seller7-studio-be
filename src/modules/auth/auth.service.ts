@@ -86,6 +86,21 @@ export async function refreshTokens(
   return { tokens, user: toSafeUser(user) };
 }
 
+export async function changePassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  const user = await User.findById(userId).select('+password');
+  if (!user) throw new ApiError(404, 'User not found');
+
+  const match = await user.comparePassword(currentPassword);
+  if (!match) throw new ApiError(401, 'Current password is incorrect');
+
+  user.password = newPassword; // pre-save hook re-hashes
+  await user.save();
+}
+
 export async function forgotPassword(email: string): Promise<void> {
   const user = await User.findOne({ email });
   if (!user) return; // Don't reveal whether account exists

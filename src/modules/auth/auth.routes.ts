@@ -8,6 +8,7 @@ import {
   loginSchema,
   forgotPasswordSchema,
   resetPasswordSchema,
+  changePasswordSchema,
 } from './auth.validation';
 import {
   authLimiter,
@@ -32,6 +33,12 @@ router.post(
   resetPasswordLimiter,
   validate(resetPasswordSchema),
   asyncHandler(authController.resetPassword),
+);
+router.post(
+  '/change-password',
+  authGuard,
+  validate(changePasswordSchema),
+  asyncHandler(authController.changePassword),
 );
 
 export default router;
